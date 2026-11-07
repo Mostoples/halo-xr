@@ -1,0 +1,13 @@
+{
+  "name": "HALO-XR · Interactive Anatomy Hologram",
+  "short_name": "HALO-XR",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#E9EFF7",
+  "theme_color": "#E9EFF7",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

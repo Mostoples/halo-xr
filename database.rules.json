@@ -1,0 +1,24 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "responses": {
+      ".read": "auth != null && (auth.uid == 'NnEzYdHTc3gne4IP0G62HNwcfDu2' || (auth.token.email_verified == true && (auth.token.email == 'mersif.storage3@gmail.com' || auth.token.email == 'mersif.storage1@gmail.com')))",
+      ".indexOn": ["ts"],
+      "$id": {
+        ".write": "(!data.exists() && newData.exists()) || (!newData.exists() && auth != null && (auth.uid == 'NnEzYdHTc3gne4IP0G62HNwcfDu2' || (auth.token.email_verified == true && (auth.token.email == 'mersif.storage3@gmail.com' || auth.token.email == 'mersif.storage1@gmail.com'))))",
+        ".validate": "newData.hasChildren(['q1', 'q2', 'q3', 'q4', 'q5', 'ts'])",
+        "q1": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && newData.val() % 1 == 0" },
+        "q2": { ".validate": "newData.isString() && newData.val().matches(/^(book|poster|video|torso|app3d)$/)" },
+        "q3": { ".validate": "newData.isString() && newData.val().matches(/^(never|once|often)$/)" },
+        "q4": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && newData.val() % 1 == 0" },
+        "q5": { ".validate": "newData.isString() && newData.val().matches(/^(heart|brain|lungs|eye|digestive|kidneys|skin|cell)$/)" },
+        "grade": { ".validate": "newData.isString() && newData.val().matches(/^(X|XI|XII|other)$/)" },
+        "school": { ".validate": "newData.isString() && newData.val().matches(/^(smamuh|man1|sman4|other)$/)" },
+        "lang": { ".validate": "newData.isString() && newData.val().matches(/^(id|en)$/)" },
+        "ts": { ".validate": "newData.val() == now" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

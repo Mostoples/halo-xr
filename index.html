@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>HALO-XR · Hologram Anatomi</title>
+  <meta name="description" content="HALO-XR: hologram anatomi interaktif Pepper's Ghost dengan kontrol gestur tanpa sentuh untuk kelas Society 5.0." />
+  <meta name="theme-color" content="#E9EFF7" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F7BFF"/><stop offset="1" stop-color="#1646D6"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 8 31 29H9Z" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><path d="M20 8v21" stroke="#BFE3FF" stroke-width="1.6"/><circle cx="20" cy="22" r="3.2" fill="#BFE3FF"/></svg>
+        <div><b>HALO-XR</b><small>Anatomy Hologram</small></div>
+      </div>
+      <div class="top-actions">
+        <button class="pill status" id="statusPill" data-go="device"><i class="dot"></i><span id="statusText"></span></button>
+        <button class="icon-btn" id="langBtn" aria-label="Bahasa / Language">ID</button>
+      </div>
+    </header>
+
+    <div class="banner" id="fileBanner" hidden>
+      Buka lewat server lokal agar model 3D bisa dimuat: jalankan <code>start.cmd</code> (atau <code>python serve.py</code>) lalu buka <code>http://localhost:8000</code>.
+    </div>
+
+    <main>
+      <!-- 01 · BERANDA -->
+      <section class="screen" id="s-home">
+        <div class="head">
+          <span class="chip" data-t="home.chip"></span>
+          <h1><span data-t="home.t1"></span><br /><span class="grad-text" data-t="home.t2"></span></h1>
+          <p class="desc" data-t="home.desc"></p>
+        </div>
+        <div class="grid-2">
+          <article class="card hero" id="homeHero">
+            <div class="hero-art"><span class="orb"></span><img id="heroImg" alt="" /></div>
+            <div class="hero-meta">
+              <span class="label" data-t="home.now"></span>
+              <h2 id="heroName"></h2>
+              <p class="muted" id="heroSys"></p>
+              <div class="row">
+                <button class="btn-primary" data-act="pyramid"><svg viewBox="0 0 24 24"><path d="M12 3 21 20H3Z"/><path d="M12 3v17"/></svg><span data-t="home.start"></span></button>
+                <button class="btn" data-go="viewer"><span data-t="home.open"></span></button>
+              </div>
+            </div>
+          </article>
+          <div class="stack">
+            <div class="stats">
+              <div class="card stat"><span class="label" data-t="home.stats.lat"></span><b id="stLat">—</b><small data-t="device.target"></small></div>
+              <div class="card stat"><span class="label" data-t="home.stats.fps"></span><b id="stFps">—</b><small>WebGL</small></div>
+              <div class="card stat"><span class="label" data-t="home.stats.acc"></span><b>≥ 90%</b><small id="accNote"></small></div>
+              <div class="card stat"><span class="label" data-t="home.stats.cost"></span><b>Rp265K</b><small>&lt; 1/10 VR</small></div>
+            </div>
+            <div class="card gesture-last">
+              <div class="g-ico" id="lastIco"></div>
+              <div><span class="label" data-t="home.lastG"></span><p id="lastG" class="strong"></p><p id="lastA" class="muted"></p></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-t="home.compare"></h3>
+          <ul class="cmp" id="cmpList"></ul>
+        </div>
+      </section>
+
+      <!-- 02 · ANATOMI -->
+      <section class="screen" id="s-library">
+        <div class="head">
+          <span class="chip" data-t="library.chip"></span>
+          <h1><span data-t="library.t1"></span><br /><span class="grad-text" data-t="library.t2"></span></h1>
+          <p class="desc" data-t="library.desc"></p>
+        </div>
+        <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="search" type="search" /></label>
+        <div class="organ-grid" id="organGrid"></div>
+      </section>
+
+      <!-- 03 · HOLOGRAM -->
+      <section class="screen" id="s-viewer">
+        <div class="head">
+          <span class="chip" data-t="viewer.chip"></span>
+          <h1><span id="vName"></span><br /><span class="grad-text" id="vSci"></span></h1>
+          <p class="desc" id="vDesc"></p>
+        </div>
+        <div class="viewer-layout">
+          <div class="stack">
+            <div class="card hero stage-card">
+              <div class="stage" id="stage">
+                <div class="labels" id="labels"></div>
+                <div class="loading" id="loading"><i></i><span data-t="viewer.loading"></span></div>
+                <div class="seg seg-dark style-toggle" id="styleSeg">
+                  <button data-style="real" data-t="viewer.real"></button><button data-style="holo" data-t="viewer.holo"></button>
+                </div>
+                <p class="stage-hint" data-t="viewer.hint"></p>
+              </div>
+            </div>
+            <div class="controls">
+              <button class="icon-btn" data-g="left" aria-label="Putar kiri"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M18 3v4h-4"/></svg></button>
+              <button class="icon-btn" data-g="right" aria-label="Putar kanan"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M18 3v4h-4"/></svg></button>
+              <button class="icon-btn" data-g="backward" aria-label="Perkecil"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11h6"/></svg></button>
+              <button class="icon-btn" data-g="forward" aria-label="Perbesar"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11h6M11 8v6"/></svg></button>
+              <button class="icon-btn" data-sense="cam" aria-label="Gestur kamera"><svg viewBox="0 0 24 24"><path d="M15 10l5-3v10l-5-3z"/><rect x="3" y="6" width="12" height="12" rx="3"/></svg></button>
+              <button class="icon-btn" data-sense="mic" aria-label="Perintah suara"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+              <button class="icon-btn" data-act="reset" aria-label="Reset"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg></button>
+              <button class="btn-primary grow" data-act="pyramid"><svg viewBox="0 0 24 24"><path d="M12 3 21 20H3Z"/><path d="M12 3v17"/></svg><span data-t="viewer.pyramid"></span></button>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card">
+              <div class="card-head"><h3 id="peelTitle"></h3><span class="pill soft" id="peelNow"></span></div>
+              <div class="seg" id="peelSeg"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3 data-t="viewer.structures"></h3>
+                <label class="toggle"><input type="checkbox" id="autoRot" /><i></i><span data-t="viewer.auto"></span></label></div>
+              <div class="chips" id="hotspots"></div>
+              <div class="focus-box" id="focusBox"></div>
+            </div>
+            <div class="card">
+              <h3 data-t="viewer.pad"></h3>
+              <div class="pad" id="pad"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-t="viewer.facts"></h3>
+          <dl class="facts" id="facts"></dl>
+          <div class="did" id="did"></div>
+        </div>
+        <div class="grid-2" id="illus"></div>
+        <div class="card" id="condCard"><h3 data-t="viewer.conditions"></h3><div class="chips static" id="conds"></div></div>
+        <p class="credit">3D model & materi organ: <a href="https://github.com/thebuggeddev/anatomy" target="_blank" rel="noopener">thebuggeddev/anatomy</a></p>
+      </section>
+
+      <!-- 04 · KELAS -->
+      <section class="screen" id="s-learn">
+        <div class="head">
+          <span class="chip" data-t="learn.chip"></span>
+          <h1><span data-t="learn.t1"></span><br /><span class="grad-text" data-t="learn.t2"></span></h1>
+          <p class="desc" data-t="learn.desc"></p>
+        </div>
+        <div class="grid-2">
+          <div class="stack">
+            <div class="card test" id="preCard"></div>
+            <div class="card test" id="postCard"></div>
+          </div>
+          <div class="card hero gain">
+            <span class="label" data-t="learn.ngain"></span>
+            <svg class="gauge" viewBox="0 0 200 200" aria-hidden="true">
+              <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F7BFF"/><stop offset="1" stop-color="#1646D6"/></linearGradient></defs>
+              <circle cx="100" cy="100" r="80" class="g-track"/><circle cx="100" cy="100" r="80" class="g-val" id="gaugeVal"/>
+            </svg>
+            <div class="gain-num"><b id="gainNum">—</b><span id="gainCat" class="pill soft"></span></div>
+            <p class="muted small" id="gainNote"></p>
+            <p class="muted small" data-t="learn.formula"></p>
+            <button class="btn ghost" id="resetQuiz" data-t="learn.resetAll"></button>
+          </div>
+        </div>
+        <div class="card survey-link">
+          <div><h3 data-t="learn.survey"></h3><p class="muted small" data-t="learn.surveyDesc"></p></div>
+          <a class="btn-primary" href="kuesioner.html" data-t="learn.surveyBtn"></a>
+        </div>
+        <div class="card">
+          <h3 data-t="learn.topics"></h3>
+          <div class="topic-list" id="topics"></div>
+        </div>
+      </section>
+
+      <!-- 05 · PERANGKAT -->
+      <section class="screen" id="s-device">
+        <div class="head">
+          <span class="chip" data-t="device.chip"></span>
+          <h1><span data-t="device.t1"></span><br /><span class="grad-text" data-t="device.t2"></span></h1>
+          <p class="desc" data-t="device.desc"></p>
+        </div>
+        <div class="card sense">
+          <h3 data-t="sense.title"></h3>
+          <p class="muted small sense-desc" data-t="sense.desc"></p>
+          <div class="sense-grid">
+            <div class="sense-col">
+              <div class="sense-row"><label class="toggle"><input type="checkbox" id="camToggle" /><i></i><span data-t="sense.cam"></span></label><span class="pill soft" id="camSt"></span></div>
+              <ul class="guide" id="camGuide"></ul>
+              <p class="note" data-t="sense.camPrivacy"></p>
+            </div>
+            <div class="sense-col">
+              <div class="sense-row"><label class="toggle"><input type="checkbox" id="micToggle" /><i></i><span data-t="sense.mic"></span></label><span class="pill soft" id="micSt"></span></div>
+              <div class="heard"><span class="label" data-t="sense.heard"></span><p id="heard">—</p></div>
+              <div class="chips static" id="voiceEx"></div>
+              <label class="toggle"><input type="checkbox" id="wakeToggle" /><i></i><span data-t="sense.wake"></span></label>
+              <p class="note" data-t="sense.micPrivacy"></p>
+            </div>
+          </div>
+          <p class="muted small" data-t="sense.tip"></p>
+        </div>
+        <div class="grid-2">
+          <div class="stack">
+            <div class="card hero conn">
+              <div class="conn-ico"><svg viewBox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg></div>
+              <div><span class="label">ESP32 · PAJ7620U2</span><h3 id="connState"></h3><p class="muted small" id="connInfo"></p></div>
+              <div class="row">
+                <button class="btn-primary" id="bleBtn"></button>
+                <button class="btn" id="demoBtn"></button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3 data-t="device.latency"></h3><span class="pill soft" id="latStatus"></span></div>
+              <div class="tiles">
+                <div><span class="label" data-t="device.last"></span><b id="latLast">—</b></div>
+                <div><span class="label" data-t="device.avg"></span><b id="latAvg">—</b></div>
+                <div><span class="label" data-t="device.max"></span><b id="latMax">—</b></div>
+              </div>
+              <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="200" id="latMeter"><i id="latBar"></i><em style="left:75%"></em></div>
+              <div class="meter-scale"><span>0</span><span data-t="device.target"></span><span>200 ms</span></div>
+              <p class="muted small" data-t="device.latNote"></p>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card">
+              <h3 data-t="device.calib"></h3>
+              <label class="range"><span data-t="device.gap"></span><input type="range" id="gap" min="0.02" max="0.2" step="0.005" /><output id="gapOut"></output></label>
+              <label class="range"><span data-t="device.size"></span><input type="range" id="size" min="0.18" max="0.45" step="0.01" /><output id="sizeOut"></output></label>
+              <label class="toggle"><input type="checkbox" id="mirror" /><i></i><span data-t="device.mirror"></span></label>
+              <label class="toggle"><input type="checkbox" id="guide" /><i></i><span>Guide</span></label>
+              <button class="btn wide" data-act="pyramid"><span data-t="home.start"></span></button>
+              <p class="note" data-t="device.note"></p>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3 data-t="device.lang"></h3><div class="seg mini" id="langSeg"><button data-lang="id">ID</button><button data-lang="en">EN</button></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-t="device.map"></h3>
+          <div class="gmap" id="gmap"></div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottomnav" id="nav">
+      <button data-go="home"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg><span data-t="nav.home"></span></button>
+      <button data-go="library"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span data-t="nav.library"></span></button>
+      <button data-go="viewer" class="center"><svg viewBox="0 0 24 24"><path d="M12 3 21 19H3Z"/><path d="M12 3v16M7.5 11h9"/></svg><span data-t="nav.viewer"></span></button>
+      <button data-go="learn"><svg viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5M22 9v6"/></svg><span data-t="nav.learn"></span></button>
+      <button data-go="device"><svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="3"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4"/><circle cx="12" cy="12" r="2"/></svg><span data-t="nav.device"></span></button>
+    </nav>
+  </div>
+
+  <!-- Pratinjau kamera (mengambang) -->
+  <div class="campip" id="campip" hidden><video id="camVideo" playsinline muted></video><canvas id="camCanvas"></canvas><b id="camLabel"></b></div>
+
+  <!-- Overlay mode piramida -->
+  <div class="pyramid" id="pyramid" hidden>
+    <canvas id="pyrCanvas"></canvas>
+    <div class="pyr-hud" id="pyrHud">
+      <p data-t="pyr.tip"></p>
+      <button class="icon-btn dark" data-sense="cam" aria-label="Gestur kamera"><svg viewBox="0 0 24 24"><path d="M15 10l5-3v10l-5-3z"/><rect x="3" y="6" width="12" height="12" rx="3"/></svg></button>
+      <button class="icon-btn dark" data-sense="mic" aria-label="Perintah suara"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button class="btn-primary" id="pyrExit"><span data-t="pyr.exit"></span></button>
+    </div>
+  </div>
+
+  <!-- Sheet kuis -->
+  <div class="sheet" id="sheet" hidden><div class="sheet-card card" id="sheetCard"></div></div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/organs-id.js"></script>
+  <script src="js/organs-en.js"></script>
+  <script src="js/organs.js"></script>
+  <script src="js/holo.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

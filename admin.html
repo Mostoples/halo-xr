@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Admin Kuesioner · HALO-XR</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#E9EFF7" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/forms.css" />
+</head>
+<body class="admin">
+  <div class="app wide">
+    <header class="topbar">
+      <div class="brand">
+        <img class="logo" src="assets/icon.svg" alt="" />
+        <div><b>HALO-XR</b><small>Admin kuesioner</small></div>
+      </div>
+      <div class="top-actions">
+        <span class="pill status" id="who" hidden><i class="dot"></i><span id="whoText"></span></span>
+        <button class="btn" id="pwOpen" hidden>Ganti password</button>
+        <button class="btn" id="logoutBtn" hidden>Keluar</button>
+      </div>
+    </header>
+
+    <!-- Login -->
+    <section class="screen" id="loginView">
+      <div class="head"><span class="chip">ADMIN</span>
+        <h1>Hasil kuesioner,<br><span class="grad-text">secara langsung.</span></h1>
+        <p class="desc">Masuk sebagai admin untuk melihat jawaban siswa.</p></div>
+      <div class="card login-card">
+        <form id="loginForm" class="login-form" autocomplete="on">
+          <label class="field"><span class="label">Username</span><input id="user" name="username" autocomplete="username" required value="admin" /></label>
+          <label class="field"><span class="label">Password</span><input id="pass" name="password" type="password" autocomplete="current-password" required /></label>
+          <button class="btn-primary big" id="pwBtn" type="submit">Masuk</button>
+        </form>
+        <p class="muted small" id="loginMsg"></p>
+        <div class="or"><span>atau</span></div>
+        <button class="btn big" id="loginBtn">
+          <svg viewBox="0 0 24 24"><path d="M21 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h5.1a4.4 4.4 0 0 1-1.9 2.9v2.4h3.1c1.7-1.6 2.7-4 2.7-7Z"/><path d="M12 21.5c2.6 0 4.7-.9 6.3-2.3l-3.1-2.4c-.9.6-2 .9-3.2.9-2.5 0-4.6-1.7-5.3-3.9H3.5v2.5A9.5 9.5 0 0 0 12 21.5Z"/></svg>
+          Masuk dengan Google</button>
+      </div>
+    </section>
+
+    <!-- Dasbor -->
+    <section class="screen" id="dashView">
+      <div class="head"><span class="chip">ANALISIS KEBUTUHAN · LIVE</span>
+        <h1>Hasil kuesioner<br><span class="grad-text">HALO-XR.</span></h1></div>
+
+      <div class="card pw-card" id="pwCard" hidden>
+        <h3>Ganti password admin</h3>
+        <form id="pwForm" class="pw-form">
+          <label class="field"><span class="label">Password baru</span><input id="pw1" type="password" autocomplete="new-password" required /></label>
+          <label class="field"><span class="label">Ulangi password</span><input id="pw2" type="password" autocomplete="new-password" required /></label>
+          <button class="btn-primary" type="submit">Simpan</button>
+        </form>
+        <p class="muted small" id="pwMsg"></p>
+      </div>
+
+      <div class="grid-2 share-grid">
+        <div class="card hero share">
+          <div>
+            <span class="label">Bagikan ke siswa</span>
+            <h3 class="link-text" id="shareUrl"></h3>
+            <div class="row">
+              <button class="btn-primary" id="copyBtn">Salin link</button>
+              <a class="btn" id="waBtn" target="_blank" rel="noopener">WhatsApp</a>
+              <button class="btn" id="qrBtn">Unduh QR</button>
+            </div>
+          </div>
+          <div class="qr" id="qr"></div>
+        </div>
+        <div class="stats kpi">
+          <div class="card stat"><span class="label">Total responden</span><b id="kTotal">0</b><small id="kToday"></small></div>
+          <div class="card stat"><span class="label">Kesulitan belajar 2D</span><b id="kQ1">—</b><small>rata-rata skala 1–5</small></div>
+          <div class="card stat"><span class="label">Minat hologram</span><b id="kQ4">—</b><small id="kQ4b">rata-rata skala 1–5</small></div>
+          <div class="card stat"><span class="label">Belum pernah 3D/AR/VR</span><b id="kQ3">—</b><small>dari responden</small></div>
+        </div>
+      </div>
+
+      <div class="card filters">
+        <div class="filter-row"><span class="label">Sekolah</span><div class="chips" id="fSchool"></div></div>
+        <div class="filter-row"><span class="label">Kelas</span><div class="chips" id="fGrade"></div></div>
+        <button class="btn" id="csvBtn">Ekspor CSV</button>
+      </div>
+
+      <div class="charts" id="charts"></div>
+
+      <div class="card">
+        <div class="card-head"><h3>Jawaban terbaru</h3><span class="muted small" id="tableNote"></span></div>
+        <div class="table-wrap"><table class="resp"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      </div>
+      <p class="credit">Data anonim · disimpan di Firebase Realtime Database proyek <b>haloxr-id</b></p>
+    </section>
+  </div>
+  <div class="tip" id="tip" role="tooltip"></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="vendor/qrcode/qrcode.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

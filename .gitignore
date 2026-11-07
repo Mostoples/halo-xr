@@ -1,0 +1,13 @@
+# Hasil jadi (bisa dibangun ulang, lihat README)
+output/
+deck/build/
+video/build/
+proposal/build/
+*.pdf
+
+# Firebase & Python lokal
+.firebase/
+*-debug.log
+__pycache__/
+*.pyc
+.env*

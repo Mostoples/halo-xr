@@ -1,0 +1,72 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**",
+      "deck/**",
+      "output/**",
+      "firmware/**",
+      "*.py",
+      "*.cmd",
+      "*.pdf",
+      "README.md",
+      "database.rules.json",
+      "video/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(glb|webp|png|svg|wasm)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "vendor/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000"
+          }
+        ]
+      },
+      {
+        "source": "sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|html|json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "emulators": {
+    "database": {
+      "port": 9000
+    },
+    "auth": {
+      "port": 9099
+    },
+    "ui": {
+      "enabled": false
+    }
+  }
+}
